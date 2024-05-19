@@ -1,4 +1,5 @@
 package work
+
 object day7 extends App {
   import scala.io.Source
   import scala.collection.mutable.ArrayStack
@@ -35,16 +36,68 @@ object day7 extends App {
     case s"$size $file"    => File(size.toInt, file)
   }.toList
 
+  // Convert the terminal output to something with enumerated types
   val terminalOutput = storageData.flatMap { str => enumerateList(str) }.toList
 
-// We want the name of the current directory, the subDirectories in the level,
-// files in our current level, and a parent if one exists. We want our top
-// level class to be able to contain all sub classes.
+  // For a given directory, let's add all of the files and other directories to
+  // the tree. Then if we need a specific directory we can just find it by name.
 
   class DirectoryStructure(
-      name: String,
-      subDirectories: mutable.Map[String, DirectoryStructure],
-      files: mutable.Map[String, Int],
-      parent: DirectoryStructure | Null
+      val name: String,
+      val subDirectories: mutable.Map[String, DirectoryStructure],
+      val files: mutable.Map[String, Int],
+      val parent: DirectoryStructure | Null
   )
+
+  // If we change to a directory that does not exist, make it
+  // If we list files, we are adding to out current structure
+
+  def initDirectoryStructure(name: String, parent: DirectoryStructure | Null) =
+    new DirectoryStructure(name, mutable.Map.empty, mutable.Map.empty, parent)
+
+  val root = initDirectoryStructure("/", null)
+
+  def changeDir(ds: DirectoryStructure, dir: String): DirectoryStructure = {
+    dir match {
+      case r: "/"  => root
+      case u: ".." => ds.parent
+      case dir @ _ => ds.subDirectories(dir)
+    }
+  }
+
+  def processCommand(ds: DirectoryStructure, c: Command): DirectoryStructure = {
+    c match {
+      case ChangeDirectory(dir) => changeDir(ds, dir)
+      case ListFiles            => ds
+    }
+  }
+
+  def processInputs(
+      ds: DirectoryStructure,
+      cmdList: List[TerminalOutput]
+  ): Unit = {
+    val newDs = cmdList.head match {
+      case Cmd(cmd) => processCommand(ds, cmd)
+      case Directory(name) => {
+        ds.subDirectories += (name -> initDirectoryStructure(name, ds))
+        ds
+      }
+      case File(size, name) => {
+        ds.files += (name -> size)
+        ds
+      }
+    }
+    if (!cmdList.tail.isEmpty) processInputs(newDs, cmdList.tail)
+  }
+
+  // root now contains everything 
+  processInputs(root, terminalOutput)
+
+  val maxSize = 100000
+
+  def solvePuzzle(): Unit = {}
+
+
+
+
 }
