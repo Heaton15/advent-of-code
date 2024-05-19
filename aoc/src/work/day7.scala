@@ -99,24 +99,41 @@ object day7 extends App {
   def fileSize(d: DirectoryStructure): Int = d.files.foldLeft(0)((a, b) => a + b._2)
 
   // Calculates the file size of the current directory and all children
-  def dirFileSize(d: DirectoryStructure, currSize: Int): Int = {
+  def dirFileSize(d: DirectoryStructure, currSize: Int = 0): Int = {
     if (d.subDirectories.isEmpty) fileSize(d) + currSize
     else fileSize(d) + d.subDirectories.foldLeft(currSize)((acc, child) => dirFileSize(child._2, acc))
   }
 
-  // def findNodes(d: DirectoryStructure, q: List[DirectoryStructure], lst: List[DirectoryStructure]): List[DirectoryStructure] = {
-  //  // If node has children, recursively count down the chain
-  //  // If node has no children, no need to continue
+  def sumOfMaxSizes(d: DirectoryStructure, acc: Int): Int = {
+    val size = dirFileSize(d)
+    val newSize = if (size < maxSize) acc + size else acc
 
-  // }
+    if (d.subDirectories.isEmpty) newSize
+    else d.subDirectories.foldLeft(newSize)((a, child) => sumOfMaxSizes(child._2, a))
+  }
 
   val bottomOfTree = lowestNodes(root, List.empty[DirectoryStructure])
-  println(bottomOfTree.head.name)
-  println(bottomOfTree.head.parent.name)
 
-  println(dirFileSize(bottomOfTree.head, 0))
-  println(dirFileSize(root, 0))
+  val part1_solution = sumOfMaxSizes(root, 0)
+  println(s"part1 solution: $part1_solution")
 
-  // val validNodes = findNodes(root, List.empty[DirectoryStructure], List.empty[DirectoryStructure])
+  val totalDiskSpace = 70000000
+  val neededUnusedSpace = 30000000
+  val totalUsedSpace = dirFileSize(root)
+
+  val neededSpace = neededUnusedSpace - (totalDiskSpace - totalUsedSpace)
+
+  def findSmallestFreeSpaceDirOptions(d: DirectoryStructure, lst: List[DirectoryStructure]): List[DirectoryStructure] = {
+    val size = dirFileSize(d)
+    val newList = if (size > neededSpace) lst :+ d else lst
+
+    if (d.subDirectories.isEmpty) newList
+    else d.subDirectories.foldLeft(newList)((a, child) => a ++ findSmallestFreeSpaceDirOptions(child._2, List.empty[DirectoryStructure]))
+
+  }
+
+  val possible_options = findSmallestFreeSpaceDirOptions(root, List.empty[DirectoryStructure])
+  val part2_solution = possible_options.reduce((a,b) => if (dirFileSize(a) < dirFileSize(b)) a else b )
+  println(s"part2 solution: ${dirFileSize(part2_solution)}")
 
 }
