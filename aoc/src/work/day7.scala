@@ -2,9 +2,6 @@ package work
 
 object day7 extends App {
   import scala.io.Source
-  import scala.collection.mutable.ArrayStack
-  import scala.collection.mutable.Stack
-  import scala.collection.mutable.Queue
   import scala.collection.*
 
 // When looking at the outputs, we see 2 kinds of issued commands
