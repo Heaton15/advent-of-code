@@ -113,7 +113,7 @@ object day9 extends App {
       val maybePoint = pointMap.get(point)
       maybePoint match {
         case Some(i) => pointMap ++ Map(point -> (i + 1))
-        case None    => pointMap ++ Map(point -> 0)
+        case None    => pointMap ++ Map(point -> 1)
       }
     }
 
@@ -122,16 +122,6 @@ object day9 extends App {
     private def left(p: Point) = Point(p.x - 1, p.y)
     private def right(p: Point) = Point(p.x + 1, p.y)
 
-    /* Overlapping     -> move H, keep T
-       HorizontalRight -> move H, keep T
-       HorizontalLeft  -> move H, keep T
-       VerticalDown    -> Move H, keep T
-       DiagonalLL      -> Move H, keep T
-       DiagonalLR      -> move H, keep T
-       VerticalUp      -> Move H, move T UP
-       DiagonalUL      -> move H, move T to old H
-       DiagonalUR      -> move H, move T to old H
-     */
     def goUp = {
       pr match {
         case Overlapping | HorizontalRight | HorizontalLeft | VerticalDown | DiagonalLL | DiagonalLR => new PointTracker(up(h), t, pointMap)
@@ -140,16 +130,6 @@ object day9 extends App {
       }
     }
 
-    /* Overlapping     -> move H, keep T
-       HorizontalRight -> move H, keep T
-       HorizontalLeft  -> move H, keep T
-       VerticalUp      -> Move H, keep T
-       DiagonalUL      -> move H, keep T
-       DiagonalUR      -> move H, keep T
-       DiagonalLL      -> Move H, move T to old H
-       DiagonalLR      -> move H, move T to old H
-       VerticalDown    -> Move H, move T
-     */
     def goDown = {
       pr match {
         case Overlapping | HorizontalRight | HorizontalLeft | VerticalUp | DiagonalUL | DiagonalUR => new PointTracker(down(h), t, pointMap)
@@ -158,16 +138,6 @@ object day9 extends App {
       }
     }
 
-    /* Overlapping     -> move H, keep T
-       HorizontalRight -> move H, keep T
-       VerticalUp      -> Move H, keep T
-       DiagonalUR      -> move H, keep T
-       VerticalDown    -> Move H, keep T
-       DiagonalLR      -> move H, keep T
-       DiagonalUL      -> move H, move T to old H
-       DiagonalLL      -> Move H, move T to old H
-       HorizontalLeft  -> move H, move T
-     */
     def goLeft = {
       pr match {
         case Overlapping | HorizontalRight | VerticalUp | DiagonalUR | VerticalDown | DiagonalLR => new PointTracker(left(h), t, pointMap)
@@ -176,16 +146,6 @@ object day9 extends App {
       }
     }
 
-    /* Overlapping     -> move H, keep T
-       DiagonalUL      -> move H, keep T
-       DiagonalLL      -> Move H, keep T
-       HorizontalLeft  -> move H, keep T
-       VerticalUp      -> Move H, keep T
-       VerticalDown    -> Move H, keep T
-       DiagonalUR      -> move H, move T to old H
-       DiagonalLR      -> move H, move T to old H
-       HorizontalRight -> move H, move T
-     */
     def goRight = {
       pr match {
         case Overlapping | DiagonalUL | DiagonalLL | HorizontalLeft | VerticalUp | VerticalDown => new PointTracker(right(h), t, pointMap)
@@ -208,12 +168,14 @@ object day9 extends App {
       case U(u) => List.tabulate(u)(_ + 0).foldLeft(tracker)((tr, i) => tr.goUp)
       case D(d) => List.tabulate(d)(_ + 0).foldLeft(tracker)((tr, i) => tr.goDown)
     }
-    //newTracker.report
+    // newTracker.report
     if (instr.tail.isEmpty) newTracker
     else processInstr(instr.tail, newTracker)
   }
 
-  val solution_1 = processInstr(instr, tracker).pointMap.values.filter(_ >= 1).sum
+  val solution_1 = processInstr(instr, tracker).pointMap.values.filter(_ >= 1).size
+
+  processInstr(instr, tracker).pointMap.foreach { case (a, b) => println(s"Point: $a , count: $b") }
   println(solution_1)
 
 }
