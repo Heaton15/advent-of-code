@@ -37,3 +37,4 @@ trait WithScala3 extends ScalaModule{
 
 object day1 extends WithScala3 
 object day2 extends WithScala3 
+object day3 extends WithScala3 

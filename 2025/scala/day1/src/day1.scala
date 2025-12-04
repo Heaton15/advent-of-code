@@ -1,5 +1,3 @@
-package work
-
 import scala.io.Source
 import scala.collection.mutable.ArrayStack
 import scala.collection.mutable.Stack

@@ -1,5 +1,3 @@
-package work
-
 import scala.io.Source
 
 case class IdPoints(first: BigInt, last: BigInt)
