@@ -4,7 +4,7 @@ import mill.scalalib.scalafmt._
 
 object v {
   val scala2 = "2.13.12"
-  val scala3 = "3.2.2"
+  val scala3 = "3.7.1"
 }
 
 trait WithScala2 extends ScalaModule{
@@ -35,4 +35,5 @@ trait WithScala3 extends ScalaModule{
   )
 }
 
-object aoc extends WithScala3 
+object day1 extends WithScala3 
+object day2 extends WithScala3 
